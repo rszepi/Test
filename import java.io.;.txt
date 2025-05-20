@@ -1,0 +1,43 @@
+import java.io.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+public class FileEncryptor {
+
+    public static void encryptFile(String inputFilePath, String outputFilePath) throws IOException, NoSuchAlgorithmException {
+        // Read the content of the input file
+        BufferedReader reader = new BufferedReader(new FileReader(inputFilePath));
+        StringBuilder fileContent = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            fileContent.append(line);
+        }
+        reader.close();
+
+        // Encrypt the content using SHA-256
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(fileContent.toString().getBytes());
+
+        // Convert the hash to a hexadecimal string
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : hash) {
+            hexString.append(String.format("%02x", b));
+        }
+
+        // Save the encrypted content to the output file
+        BufferedWriter writer = new BufferedWriter(new FileWriter(outputFilePath));
+        writer.write(hexString.toString());
+        writer.close();
+    }
+
+    public static void main(String[] args) {
+        String inputFile = "example.txt";
+        String outputFile = "encrypted_example.txt";
+        try {
+            encryptFile(inputFile, outputFile);
+            System.out.println("File '" + inputFile + "' has been encrypted and saved to '" + outputFile + "'.");
+        } catch (IOException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+    }
+}
